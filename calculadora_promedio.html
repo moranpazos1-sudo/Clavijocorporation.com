@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Promedio Bimestral</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="number"].error {
+            border-color: #f44336;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .btn-calcular {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-calcular:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-calcular:active {
+            transform: translateY(0);
+        }
+
+        .pantalla-aprobado, .pantalla-desaprobado {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .pantalla-aprobado {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .pantalla-desaprobado {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .contenido-resultado {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            max-width: 600px;
+        }
+
+        .icono-grande {
+            font-size: 120px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .mensaje-principal {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: zoomIn 0.8s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .promedio-grande {
+            font-size: 80px;
+            font-weight: bold;
+            margin: 30px 0;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .mensaje-secundario {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .btn-volver {
+            padding: 15px 40px;
+            background: white;
+            color: #333;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-volver:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .globo {
+            position: fixed;
+            font-size: 50px;
+            animation: caer 4s linear;
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        @keyframes caer {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0.5;
+            }
+        }
+
+        .palabra-flotante {
+            position: fixed;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            animation: flotar 3s ease-out forwards;
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        @keyframes flotar {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.5);
+            }
+            20% {
+                opacity: 1;
+                transform: translateY(0) scale(1.2);
+            }
+            80% {
+                opacity: 1;
+                transform: translateY(-30px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(0.8);
+            }
+        }
+
+        .emoji-triste-grande {
+            animation: girar 2s ease-in-out infinite;
+        }
+
+        @keyframes girar {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .detalles-calculo {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .mensaje-principal {
+                font-size: 36px;
+            }
+
+            .promedio-grande {
+                font-size: 60px;
+            }
+
+            .mensaje-secundario {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Clavijo Corporation</h1>
+            <p>Sistema de Gestión Académica</p>
+        </div>
+
+        <div class="content">
+            <h2>📚 Calculadora de Promedio</h2>
+            <p class="subtitle">Ingresa tus 4 notas del bimestre (0-20)</p>
+
+            <form id="formNotas">
+                <div class="form-group">
+                    <label for="nota1">Nota 1: <span style="color: red;">*</span></label>
+                    <input type="number" id="nota1" min="0" max="20" step="0.01" placeholder="Ingresa la nota 1" required>
+                    <div class="error-message" id="error1">⚠️ Ingresa una nota entre 0 y 20</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nota2">Nota 2: <span style="color: red;">*</span></label>
+                    <input type="number" id="nota2" min="0" max="20" step="0.01" placeholder="Ingresa la nota 2" required>
+                    <div class="error-message" id="error2">⚠️ Ingresa una nota entre 0 y 20</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nota3">Nota 3: <span style="color: red;">*</span></label>
+                    <input type="number" id="nota3" min="0" max="20" step="0.01" placeholder="Ingresa la nota 3" required>
+                    <div class="error-message" id="error3">⚠️ Ingresa una nota entre 0 y 20</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nota4">Nota 4: <span style="color: red;">*</span></label>
+                    <input type="number" id="nota4" min="0" max="20" step="0.01" placeholder="Ingresa la nota 4" required>
+                    <div class="error-message" id="error4">⚠️ Ingresa una nota entre 0 y 20</div>
+                </div>
+
+                <button type="submit" class="btn-calcular">🧮 Calcular Promedio</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pantalla de Aprobado -->
+    <div class="pantalla-aprobado" id="pantallaAprobado">
+        <div class="contenido-resultado">
+            <div class="icono-grande">🎉</div>
+            <div class="mensaje-principal">¡FELICITACIONES!</div>
+            <div class="promedio-grande" id="promedioAprobado"></div>
+            <div class="mensaje-secundario">✅ APROBADO</div>
+            <div class="detalles-calculo" id="detallesAprobado"></div>
+            <button class="btn-volver" onclick="volverCalculadora()">🔄 Calcular Nuevamente</button>
+        </div>
+    </div>
+
+    <!-- Pantalla de Desaprobado -->
+    <div class="pantalla-desaprobado" id="pantallaDesaprobado">
+        <div class="contenido-resultado">
+            <div class="icono-grande emoji-triste-grande">😢</div>
+            <div class="mensaje-principal">¡PONTE A ESTUDIAR!</div>
+            <div class="promedio-grande" id="promedioDesaprobado"></div>
+            <div class="mensaje-secundario">❌ DESAPROBADO</div>
+            <div class="detalles-calculo" id="detallesDesaprobado"></div>
+            <button class="btn-volver" onclick="volverCalculadora()">🔄 Intentar Nuevamente</button>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('formNotas');
+
+        // Validación en tiempo real
+        ['nota1', 'nota2', 'nota3', 'nota4'].forEach(id => {
+            const input = document.getElementById(id);
+            
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                document.getElementById('error' + id.slice(-1)).style.display = 'none';
+                
+                let valor = parseFloat(this.value);
+                
+                if (this.value !== '') {
+                    if (valor < 0) {
+                        this.value = 0;
+                    } else if (valor > 20) {
+                        this.value = 20;
+                    }
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                if (this.value !== '') {
+                    let valor = parseFloat(this.value);
+                    if (valor < 0) this.value = 0;
+                    if (valor > 20) this.value = 20;
+                }
+            });
+        });
+
+        // Evento de envío del formulario
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (validarNotas()) {
+                calcularPromedio();
+            }
+        });
+
+        function validarNotas() {
+            const notas = [
+                { id: 'nota1', num: 1 },
+                { id: 'nota2', num: 2 },
+                { id: 'nota3', num: 3 },
+                { id: 'nota4', num: 4 }
+            ];
+
+            let hayError = false;
+
+            notas.forEach(nota => {
+                const input = document.getElementById(nota.id);
+                const error = document.getElementById('error' + nota.num);
+                const valor = input.value;
+
+                if (valor === '' || valor === null) {
+                    input.classList.add('error');
+                    error.textContent = '⚠️ Este campo es OBLIGATORIO';
+                    error.style.display = 'block';
+                    hayError = true;
+                } else {
+                    const valorNumerico = parseFloat(valor);
+                    
+                    if (isNaN(valorNumerico)) {
+                        input.classList.add('error');
+                        error.textContent = '⚠️ Ingresa un número válido';
+                        error.style.display = 'block';
+                        hayError = true;
+                    } else if (valorNumerico < 0 || valorNumerico > 20) {
+                        input.classList.add('error');
+                        error.textContent = '⚠️ La nota debe estar entre 0 y 20';
+                        error.style.display = 'block';
+                        hayError = true;
+                    } else {
+                        input.classList.remove('error');
+                        error.style.display = 'none';
+                    }
+                }
+            });
+
+            return !hayError;
+        }
+
+        function calcularPromedio() {
+            // Obtener valores
+            const n1 = parseFloat(document.getElementById('nota1').value);
+            const n2 = parseFloat(document.getElementById('nota2').value);
+            const n3 = parseFloat(document.getElementById('nota3').value);
+            const n4 = parseFloat(document.getElementById('nota4').value);
+
+            // Calcular promedio: (Nota1 + Nota2 + Nota3 + Nota4) / 4
+            const suma = n1 + n2 + n3 + n4;
+            const promedio = suma / 4;
+            const promedioRedondeado = promedio.toFixed(2);
+
+            // Crear detalles del cálculo
+            const detalles = `
+                <div><strong>Notas Ingresadas:</strong></div>
+                <div>Nota 1: ${n1.toFixed(2)} | Nota 2: ${n2.toFixed(2)}</div>
+                <div>Nota 3: ${n3.toFixed(2)} | Nota 4: ${n4.toFixed(2)}</div>
+                <div style="margin-top: 15px;"><strong>Cálculo: ${n1.toFixed(2)} + ${n2.toFixed(2)} + ${n3.toFixed(2)} + ${n4.toFixed(2)} = ${suma.toFixed(2)}</strong></div>
+                <div><strong>${suma.toFixed(2)} ÷ 4 = ${promedioRedondeado}</strong></div>
+            `;
+
+            // Ocultar formulario
+            document.querySelector('.container').style.display = 'none';
+
+            // Mostrar resultado según promedio (≥13 = APROBADO)
+            if (promedio >= 13) {
+                mostrarAprobado(promedioRedondeado, detalles);
+            } else {
+                mostrarDesaprobado(promedioRedondeado, detalles);
+            }
+        }
+
+        function mostrarAprobado(promedio, detalles) {
+            document.getElementById('promedioAprobado').textContent = promedio;
+            document.getElementById('detallesAprobado').innerHTML = detalles;
+            document.getElementById('pantallaAprobado').style.display = 'flex';
+            
+            crearGlobos();
+            crearPalabrasFelicitacion();
+        }
+
+        function mostrarDesaprobado(promedio, detalles) {
+            document.getElementById('promedioDesaprobado').textContent = promedio;
+            document.getElementById('detallesDesaprobado').innerHTML = detalles;
+            document.getElementById('pantallaDesaprobado').style.display = 'flex';
+        }
+
+        function crearGlobos() {
+            const emojisGlobos = ['🎈', '🎉', '🎊', '🎁', '⭐', '✨', '🌟', '💫'];
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const globo = document.createElement('div');
+                    globo.className = 'globo';
+                    globo.textContent = emojisGlobos[Math.floor(Math.random() * emojisGlobos.length)];
+                    globo.style.left = Math.random() * 100 + '%';
+                    globo.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                    document.body.appendChild(globo);
+                    
+                    setTimeout(() => globo.remove(), 5000);
+                }, i * 100);
+            }
+        }
+
+        function crearPalabrasFelicitacion() {
+            const palabras = ['¡EXCELENTE!', '¡BRAVO!', '¡GENIAL!', '¡INCREÍBLE!', '¡BIEN HECHO!', '¡SIGUE ASÍ!'];
+            
+            palabras.forEach((palabra, index) => {
+                setTimeout(() => {
+                    const elemento = document.createElement('div');
+                    elemento.className = 'palabra-flotante';
+                    elemento.textContent = palabra;
+                    elemento.style.left = (Math.random() * 60 + 20) + '%';
+                    elemento.style.top = '50%';
+                    document.body.appendChild(elemento);
+                    
+                    setTimeout(() => elemento.remove(), 3000);
+                }, index * 500);
+            });
+        }
+
+        function volverCalculadora() {
+            // Ocultar pantallas de resultado
+            document.getElementById('pantallaAprobado').style.display = 'none';
+            document.getElementById('pantallaDesaprobado').style.display = 'none';
+            
+            // Mostrar formulario
+            document.querySelector('.container').style.display = 'block';
+            
+            // Limpiar formulario
+            document.getElementById('formNotas').reset();
+            
+            // Limpiar errores
+            ['nota1', 'nota2', 'nota3', 'nota4'].forEach(id => {
+                document.getElementById(id).classList.remove('error');
+                document.getElementById('error' + id.slice(-1)).style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
